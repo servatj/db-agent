@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Database Agent System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1, h2, h3 {
+      color: #333;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+    .loading {
+      display: none;
+      margin-top: 10px;
+    }
+    .checkbox-container {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Database Agent System</h1>
+  <p>This system uses three AI agents to design, build, and analyze databases.</p>
+  
+  <div class="container">
+    <div class="card">
+      <h2>Workflow</h2>
+      <p>Run the entire workflow from design to analysis.</p>
+      
+      <h3>Requirements</h3>
+      <textarea id="requirements" placeholder="Enter database requirements...">Create a database for an e-commerce platform with the following requirements:
+
+1. Store information about users, including:
+   - User ID, name, email, password, address, phone number, registration date
+
+2. Store information about products, including:
+   - Product ID, name, description, price, stock quantity, category
+
+3. Store information about orders, including:
+   - Order ID, user ID, order date, total amount, status
+
+4. Store information about order items, including:
+   - Order item ID, order ID, product ID, quantity, price
+
+5. Store information about product categories, including:
+   - Category ID, name, description
+
+6. Store information about product reviews, including:
+   - Review ID, product ID, user ID, rating, comment, date
+
+7. Ensure proper relationships between tables
+8. Include appropriate indexes for performance
+9. Ensure data integrity with constraints</textarea>
+      
+      <h3>Analysis Request</h3>
+      <textarea id="request" placeholder="Enter analysis request...">Show me the top 5 products by sales volume, including their category and average rating.</textarea>
+      
+      <div class="checkbox-container">
+        <input type="checkbox" id="includeSampleData" checked>
+        <label for="includeSampleData">Include sample data</label>
+      </div>
+      
+      <button id="runWorkflow">Run Workflow</button>
+      <div id="workflowLoading" class="loading">Processing...</div>
+      
+      <h3>Result</h3>
+      <pre id="workflowResult">Results will appear here...</pre>
+    </div>
+    
+    <div class="card">
+      <h2>Individual Steps</h2>
+      
+      <h3>1. Design Schema</h3>
+      <button id="designSchema">Design Schema</button>
+      <div id="designLoading" class="loading">Processing...</div>
+      <pre id="designResult">Results will appear here...</pre>
+      
+      <h3>2. Build Database</h3>
+      <button id="buildDatabase">Build Database</button>
+      <div id="buildLoading" class="loading">Processing...</div>
+      <pre id="buildResult">Results will appear here...</pre>
+      
+      <h3>3. Add Sample Data</h3>
+      <button id="addSampleData">Add Sample Data</button>
+      <div id="sampleDataLoading" class="loading">Processing...</div>
+      <pre id="sampleDataResult">Results will appear here...</pre>
+      
+      <h3>4. Analyze Data</h3>
+      <button id="analyzeData">Analyze Data</button>
+      <div id="analyzeLoading" class="loading">Processing...</div>
+      <pre id="analyzeResult">Results will appear here...</pre>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Run Workflow
+      document.getElementById('runWorkflow').addEventListener('click', async function() {
+        const requirements = document.getElementById('requirements').value;
+        const request = document.getElementById('request').value;
+        const includeSampleData = document.getElementById('includeSampleData').checked;
+        
+        if (!requirements || !request) {
+          alert('Please enter both requirements and request');
+          return;
+        }
+        
+        document.getElementById('workflowLoading').style.display = 'block';
+        document.getElementById('workflowResult').textContent = 'Processing...';
+        
+        try {
+          const response = await fetch('/workflow', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ requirements, request, includeSampleData })
+          });
+          
+          const result = await response.json();
+          document.getElementById('workflowResult').textContent = JSON.stringify(result, null, 2);
+        } catch (error) {
+          document.getElementById('workflowResult').textContent = 'Error: ' + error.message;
+        }
+        
+        document.getElementById('workflowLoading').style.display = 'none';
+      });
+      
+      // Design Schema
+      document.getElementById('designSchema').addEventListener('click', async function() {
+        const requirements = document.getElementById('requirements').value;
+        
+        if (!requirements) {
+          alert('Please enter requirements');
+          return;
+        }
+        
+        document.getElementById('designLoading').style.display = 'block';
+        document.getElementById('designResult').textContent = 'Processing...';
+        
+        try {
+          const response = await fetch('/design', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ requirements })
+          });
+          
+          const result = await response.json();
+          document.getElementById('designResult').textContent = JSON.stringify(result, null, 2);
+        } catch (error) {
+          document.getElementById('designResult').textContent = 'Error: ' + error.message;
+        }
+        
+        document.getElementById('designLoading').style.display = 'none';
+      });
+      
+      // Build Database
+      document.getElementById('buildDatabase').addEventListener('click', async function() {
+        const designResult = document.getElementById('designResult').textContent;
+        
+        if (designResult === 'Results will appear here...' || designResult === 'Processing...') {
+          alert('Please design the schema first');
+          return;
+        }
+        
+        try {
+          const result = JSON.parse(designResult);
+          const schema = result.schema;
+          
+          document.getElementById('buildLoading').style.display = 'block';
+          document.getElementById('buildResult').textContent = 'Processing...';
+          
+          const response = await fetch('/build', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ schema })
+          });
+          
+          const buildResult = await response.json();
+          document.getElementById('buildResult').textContent = JSON.stringify(buildResult, null, 2);
+        } catch (error) {
+          document.getElementById('buildResult').textContent = 'Error: ' + error.message;
+        }
+        
+        document.getElementById('buildLoading').style.display = 'none';
+      });
+      
+      // Add Sample Data
+      document.getElementById('addSampleData').addEventListener('click', async function() {
+        document.getElementById('sampleDataLoading').style.display = 'block';
+        document.getElementById('sampleDataResult').textContent = 'Processing...';
+        
+        try {
+          const response = await fetch('/sample-data', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+          });
+          
+          const result = await response.json();
+          document.getElementById('sampleDataResult').textContent = JSON.stringify(result, null, 2);
+        } catch (error) {
+          document.getElementById('sampleDataResult').textContent = 'Error: ' + error.message;
+        }
+        
+        document.getElementById('sampleDataLoading').style.display = 'none';
+      });
+      
+      // Analyze Data
+      document.getElementById('analyzeData').addEventListener('click', async function() {
+        const request = document.getElementById('request').value;
+        
+        if (!request) {
+          alert('Please enter an analysis request');
+          return;
+        }
+        
+        document.getElementById('analyzeLoading').style.display = 'block';
+        document.getElementById('analyzeResult').textContent = 'Processing...';
+        
+        try {
+          const response = await fetch('/analyze', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ request })
+          });
+          
+          const result = await response.json();
+          document.getElementById('analyzeResult').textContent = JSON.stringify(result, null, 2);
+        } catch (error) {
+          document.getElementById('analyzeResult').textContent = 'Error: ' + error.message;
+        }
+        
+        document.getElementById('analyzeLoading').style.display = 'none';
+      });
+    });
+  </script>
+</body>
+</html> 
